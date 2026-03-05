@@ -11,7 +11,7 @@
                 @csrf
                 
                 <!-- Main Info -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                <div class="card shadow-sm rounded-lg mb-6">
                     <div class="p-6 text-gray-900">
                         <h3 class="text-lg font-medium mb-4">Request Details</h3>
                         
@@ -37,7 +37,7 @@
                 </div>
 
                 <!-- Items -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                <div class="card shadow-sm rounded-lg mb-6">
                     <div class="p-6 text-gray-900">
                         <div class="d-flex justify-content-between mb-4">
                             <h3 class="text-lg font-medium">Items</h3>
@@ -58,7 +58,7 @@
                     </div>
                 </div>
 
-                <div class="flex items-center gap-4">
+                <div class="form-actions-sticky mt-4">
                     <button type="submit" name="action" value="submit" class="btn btn-primary">Submit Request</button>
                     <button type="submit" name="action" value="draft" class="btn btn-secondary">Save as Draft</button>
                     <a href="{{ route('purchase-requests.index') }}" class="btn btn-link text-gray-600">Cancel</a>
@@ -76,7 +76,7 @@
 
             function createItemRow(index) {
                 const html = `
-                    <div class="card mb-3 item-row" id="item-row-${index}">
+                    <div class="card border mb-3 item-row" style="background-color: rgba(255,255,255,0.02)" id="item-row-${index}">
                         <div class="card-body">
                             <div class="d-flex justify-content-between mb-3">
                                 <h5 class="card-title">Item #${index + 1}</h5>
@@ -96,7 +96,7 @@
                                 </div>
                                 <div class="col-md-2 mb-3">
                                     <label class="form-label">UOM *</label>
-                                    <select name="items[${index}][uom]" class="form-control" required>
+                                    <select name="items[${index}][uom]" class="form-control tomselect-uom" required>
                                         <option value="">Select UOM</option>
                                         @foreach($uoms as $uom)
                                             <option value="{{ $uom->name }}">{{ $uom->name }}</option>
@@ -145,8 +145,48 @@
                 itemIndex++;
             }
 
+            // Initialize existing UOM dropdowns (if any, like when adding immediately)
+            document.querySelectorAll('.tomselect-uom').forEach((el) => {
+                if(!el.classList.contains('tomselected')) { // Prevent re-initialization
+                    new TomSelect(el, {
+                        create: true,
+                        sortField: {
+                            field: "text",
+                            direction: "asc"
+                        },
+                        placeholder: "Select UOM"
+                    });
+                }
+            });
+
+            // Initialize Purpose Dropdown
+            const purposeSelect = document.getElementById('purpose');
+            if (purposeSelect) {
+                new TomSelect(purposeSelect, {
+                    create: true,
+                    sortField: {
+                        field: "text",
+                        direction: "asc"
+                    },
+                    placeholder: "Select Purpose"
+                });
+            }
+
             addButton.addEventListener('click', function() {
                 container.insertAdjacentHTML('beforeend', createItemRow(itemIndex));
+                
+                // Initialize TomSelect for the newly created UOM dropdown
+                const newSelect = container.querySelector(`#item-row-${itemIndex} .tomselect-uom`);
+                if (newSelect) {
+                    new TomSelect(newSelect, {
+                        create: true,
+                        sortField: {
+                            field: "text",
+                            direction: "asc"
+                        },
+                        placeholder: "Select UOM"
+                    });
+                }
                 itemIndex++;
             });
 
@@ -163,4 +203,44 @@
             });
         });
     </script>
+    <style>
+        /* To prevent TomSelect dropdown cutoff inside cards */
+        .card-body {
+            overflow: visible !important;
+        }
+        .bg-white {
+            overflow: visible !important; 
+        }
+
+        @media (max-width: 768px) {
+            .form-actions-sticky {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: white;
+                padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom));
+                box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
+                z-index: 1030;
+                display: flex;
+                gap: 0.5rem;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            .form-actions-sticky .btn {
+                flex: 1 1 auto;
+                margin: 0 !important;
+            }
+            .pb-12 {
+                padding-bottom: calc(5rem + env(safe-area-inset-bottom)) !important;
+            }
+        }
+        @media (min-width: 769px) {
+            .form-actions-sticky {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+            }
+        }
+    </style>
 </x-app-layout>

@@ -366,6 +366,18 @@
                 $sigProcBase64 = 'data:' . $mime . ';base64,' . base64_encode(file_get_contents($sigProcPath));
             }
         }
+
+        $sigRequesterBase64 = '';
+        if ($purchaseRequest->user?->signature_path) {
+            $sigRequesterPath = storage_path('app/public/' . $purchaseRequest->user->signature_path);
+            if (!file_exists($sigRequesterPath)) {
+                $sigRequesterPath = public_path('storage/' . $purchaseRequest->user->signature_path);
+            }
+            if (file_exists($sigRequesterPath) && is_file($sigRequesterPath)) {
+                $mime = function_exists('mime_content_type') ? mime_content_type($sigRequesterPath) : 'image/png';
+                $sigRequesterBase64 = 'data:' . $mime . ';base64,' . base64_encode(file_get_contents($sigRequesterPath));
+            }
+        }
     @endphp
 
     <style>
@@ -379,7 +391,11 @@
             <td>
                 <div class="sig-header">Request By</div>
                 <div class="sig-body">
-                    <div class="sig-spacer"></div>
+                    @if($sigRequesterBase64)
+                        <img src="{{ $sigRequesterBase64 }}" class="sig-image">
+                    @else
+                        <div class="sig-spacer"></div>
+                    @endif
                     <div class="sig-name">{{ $purchaseRequest->user->name }}</div>
                     <div class="sig-role">{{ $purchaseRequest->user->getRoleNames()->first() ?? 'Staff' }}</div>
                 </div>

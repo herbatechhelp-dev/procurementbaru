@@ -11,53 +11,45 @@
             <!-- Statistical Summary -->
             <div class="row mb-4">
                 <div class="col-md-3">
-                    <div class="small-box bg-info">
-                        <div class="inner">
-                            <h3>{{ $stats['total_pr'] }}</h3>
-                            <p>Total PR</p>
+                    <div class="card shadow-sm border-0 bg-info" style="border-radius: 15px; overflow: hidden; position: relative;">
+                        <div class="card-body p-4 text-white">
+                            <h3 class="display-4 font-weight-bold mb-0" style="font-size: 2.5rem; z-index: 2; position: relative;">{{ $stats['total_pr'] }}</h3>
+                            <p class="mb-0 mt-2 text-white-50 font-weight-bold" style="letter-spacing: 1px; z-index: 2; position: relative; text-transform: uppercase; font-size: 0.85rem;">Total PR</p>
                         </div>
-                        <div class="icon">
-                            <i class="fas fa-file-invoice"></i>
-                        </div>
+                        <i class="fas fa-file-invoice" style="position: absolute; right: -20px; bottom: -20px; font-size: 100px; color: rgba(255,255,255,0.15); z-index: 1;"></i>
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="small-box bg-warning">
-                        <div class="inner">
-                            <h3>{{ $stats['pending_pr'] }}</h3>
-                            <p>Pending Review</p>
+                    <div class="card shadow-sm border-0 bg-warning" style="border-radius: 15px; overflow: hidden; position: relative;">
+                        <div class="card-body p-4 text-white">
+                            <h3 class="display-4 font-weight-bold mb-0" style="font-size: 2.5rem; z-index: 2; position: relative; color: white;">{{ $stats['pending_pr'] }}</h3>
+                            <p class="mb-0 mt-2 text-white-50 font-weight-bold" style="letter-spacing: 1px; z-index: 2; position: relative; text-transform: uppercase; font-size: 0.85rem; color: rgba(255,255,255,0.7) !important;">Pending Review</p>
                         </div>
-                        <div class="icon">
-                            <i class="fas fa-clock"></i>
-                        </div>
+                        <i class="fas fa-clock" style="position: absolute; right: -20px; bottom: -20px; font-size: 100px; color: rgba(255,255,255,0.2); z-index: 1;"></i>
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="small-box bg-primary">
-                        <div class="inner">
-                            <h3>{{ $stats['approved_pr'] }}</h3>
-                            <p>Approved / Processing</p>
+                    <div class="card shadow-sm border-0 bg-primary" style="border-radius: 15px; overflow: hidden; position: relative;">
+                        <div class="card-body p-4 text-white">
+                            <h3 class="display-4 font-weight-bold mb-0" style="font-size: 2.5rem; z-index: 2; position: relative;">{{ $stats['approved_pr'] }}</h3>
+                            <p class="mb-0 mt-2 text-white-50 font-weight-bold" style="letter-spacing: 1px; z-index: 2; position: relative; text-transform: uppercase; font-size: 0.85rem;">Approved/Processing</p>
                         </div>
-                        <div class="icon">
-                            <i class="fas fa-check-circle"></i>
-                        </div>
+                        <i class="fas fa-check-circle" style="position: absolute; right: -20px; bottom: -20px; font-size: 100px; color: rgba(255,255,255,0.15); z-index: 1;"></i>
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="small-box bg-success">
-                        <div class="inner">
-                            <h3>{{ $stats['completed_pr'] }}</h3>
-                            <p>Completed</p>
+                    <div class="card shadow-sm border-0 bg-success" style="border-radius: 15px; overflow: hidden; position: relative;">
+                        <div class="card-body p-4 text-white">
+                            <h3 class="display-4 font-weight-bold mb-0" style="font-size: 2.5rem; z-index: 2; position: relative;">{{ $stats['completed_pr'] }}</h3>
+                            <p class="mb-0 mt-2 text-white-50 font-weight-bold" style="letter-spacing: 1px; z-index: 2; position: relative; text-transform: uppercase; font-size: 0.85rem;">Completed</p>
                         </div>
-                        <div class="icon">
-                            <i class="fas fa-flag-checkered"></i>
-                        </div>
+                        <i class="fas fa-flag-checkered" style="position: absolute; right: -20px; bottom: -20px; font-size: 100px; color: rgba(255,255,255,0.15); z-index: 1;"></i>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
+            <div class="card shadow-sm rounded-lg">
+                <div class="card-body p-4">
                     <h3 class="text-lg font-medium mb-4"><i class="fas fa-file-excel mr-2 text-success"></i> Export Purchase Request Data</h3>
                     
                     <form id="filterForm" action="{{ route('reports.index') }}" method="GET">
@@ -96,11 +88,11 @@
                     </form>
                 </div>
             </div>
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mt-4">
-                <div class="p-6 text-gray-900">
+            <div class="card shadow-sm rounded-lg mt-4">
+                <div class="card-body p-4">
                     <h3 class="text-lg font-medium mb-4"><i class="fas fa-list mr-2 text-info"></i> Report Data List</h3>
                     <div class="table-responsive">
-                        <table class="table table-bordered table-striped">
+                        <table class="table table-hover table-borderless">
                             <thead>
                                 <tr>
                                     <th>PR Number</th>
@@ -135,7 +127,7 @@
                                         <span class="badge {{ $badgeClass }}">{{ $statusLabel }}</span>
                                     </td>
                                     <td>
-                                        <a href="{{ route('purchase-requests.show', $pr) }}" class="btn btn-sm btn-info" target="_blank">
+                                        <a href="{{ route('purchase-requests.show', $pr) }}" class="btn btn-sm btn-info">
                                             <i class="fas fa-eye"></i>
                                         </a>
                                     </td>

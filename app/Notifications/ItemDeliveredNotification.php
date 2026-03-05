@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use App\Models\PrItem;
 
+
 class ItemDeliveredNotification extends Notification
 {
     use Queueable;
@@ -19,7 +20,7 @@ class ItemDeliveredNotification extends Notification
 
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return ['database', 'mail'];
     }
 
     public function toArray(object $notifiable): array
@@ -32,5 +33,15 @@ class ItemDeliveredNotification extends Notification
             'type' => 'status_update',
             'url' => route('purchase-requests.show', $this->item->purchase_request_id),
         ];
+    }
+
+    public function toMail(object $notifiable)
+    {
+        return (new \Illuminate\Notifications\Messages\MailMessage)
+                    ->subject('Barang Diterima: ' . $this->item->purchaseRequest->pr_number)
+                    ->greeting('Halo,')
+                    ->line("Item '{$this->item->item_name}' telah dikirim (Delivered).")
+                    ->action('Lihat Detail PR', route('purchase-requests.show', $this->item->purchase_request_id))
+                    ->line('Terima kasih telah menggunakan PR System.');
     }
 }

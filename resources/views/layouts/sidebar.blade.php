@@ -48,6 +48,15 @@
                 @endcan
 
                 @can('view pr')
+                @if(Auth::user()->hasAnyRole(['operational_manager', 'general_manager', 'superadmin']))
+                <li class="nav-item">
+                    <a href="{{ route('purchase-requests.approvals') }}" class="nav-link {{ request()->routeIs('purchase-requests.approvals') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-user-check"></i>
+                        <p>Approval Queue</p>
+                    </a>
+                </li>
+                @endif
+
                 <li class="nav-item">
                     <a href="{{ route('purchase-requests.index') }}" class="nav-link {{ request()->routeIs('purchase-requests.index') && !request()->routeIs('purchase-requests.rejected') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-shopping-cart"></i>

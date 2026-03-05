@@ -5,37 +5,34 @@
                 {{ $title ?? __('Purchase Requests') }}
             </h2>
             @can('create pr')
+            @if(empty($hideCreateButton))
             <a href="{{ route('purchase-requests.create') }}" class="btn btn-primary btn-sm">
                 <i class="fas fa-plus"></i> Create new PR
             </a>
+            @endif
             @endcan
         </div>
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    @if(session('success'))
-                        <div class="alert alert-success">{{ session('success') }}</div>
-                    @endif
-                    @if(session('error'))
-                        <div class="alert alert-danger">{{ session('error') }}</div>
-                    @endif
+            <div class="card shadow-sm rounded-lg">
+                <div class="card-body p-4">
+
 
                     @if(!isset($title) || !str_contains(strtolower($title), 'needs revision'))
-                        @if(auth()->user()->hasAnyRole(['operational_manager', 'general_manager', 'procurement', 'superadmin']))
+                        @if(auth()->user()->hasAnyRole(['procurement', 'superadmin']))
                         <!-- Department Tabs -->
                         <div class="mb-4">
-                            <ul class="nav nav-pills bg-light p-1 rounded-lg">
+                            <ul class="nav nav-pills p-1 rounded-lg" style="background-color: rgba(255,255,255,0.05);">
                                 <li class="nav-item">
-                                    <a class="nav-link {{ !request('department_id') ? 'active' : '' }} small py-1 px-3" href="{{ request()->fullUrlWithQuery(['department_id' => null]) }}">
+                                    <a class="nav-link {{ !request('department_id') ? 'active bg-primary' : 'text-muted' }} small py-1 px-3" href="{{ request()->fullUrlWithQuery(['department_id' => null]) }}">
                                         All Departments
                                     </a>
                                 </li>
                                 @foreach($departments as $dept)
                                 <li class="nav-item">
-                                    <a class="nav-link {{ request('department_id') == $dept->id ? 'active' : '' }} small py-1 px-3" href="{{ request()->fullUrlWithQuery(['department_id' => $dept->id]) }}">
+                                    <a class="nav-link {{ request('department_id') == $dept->id ? 'active bg-primary' : 'text-muted' }} small py-1 px-3" href="{{ request()->fullUrlWithQuery(['department_id' => $dept->id]) }}">
                                         {{ $dept->code }}
                                     </a>
                                 </li>
@@ -44,7 +41,7 @@
                         </div>
 
                         <!-- Filter Form -->
-                        <div class="card bg-white mb-4 shadow-sm border">
+                        <div class="card mb-4 shadow-sm" style="background-color: rgba(255,255,255,0.02)">
                             <div class="card-body py-3">
                                 <form action="{{ request()->url() }}" method="GET" class="row align-items-end mb-0">
                                     @if(request('department_id'))
@@ -52,19 +49,19 @@
                                     @endif
                                     
                                     <div class="col-md-5 mb-2">
-                                        <label for="search" class="form-label font-weight-bold small text-uppercase">Search</label>
+                                        <label for="search" class="form-label font-weight-bold small text-uppercase opacity-75">Search</label>
                                         <div class="input-group input-group-sm">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text bg-white border-right-0">
-                                                    <i class="fas fa-search text-muted"></i>
+                                                <span class="input-group-text bg-transparent border-right-0 text-muted">
+                                                    <i class="fas fa-search"></i>
                                                 </span>
                                             </div>
-                                            <input type="text" name="search" id="search" class="form-control border-left-0" placeholder="PR Number, Purpose, Requester, or Item Name..." value="{{ request('search') }}">
+                                            <input type="text" name="search" id="search" class="form-control border-left-0" placeholder="PR Number, Purpose, Requester..." value="{{ request('search') }}">
                                         </div>
                                     </div>
 
                                     <div class="col-md-3 mb-2">
-                                        <label for="status" class="form-label font-weight-bold small text-uppercase">Status</label>
+                                        <label for="status" class="form-label font-weight-bold small text-uppercase opacity-75">Status</label>
                                         <select name="status" id="status" class="form-control form-control-sm">
                                             <option value="">All Status</option>
                                             <option value="draft" {{ request('status') == 'draft' ? 'selected' : '' }}>Draft</option>
@@ -98,14 +95,14 @@
                         </div>
                         @else
                             <!-- Simple Search for Regular User -->
-                            <div class="card bg-white mb-4 shadow-sm border">
+                            <div class="card mb-4 shadow-sm" style="background-color: rgba(255,255,255,0.02)">
                                 <div class="card-body py-2">
                                     <form action="{{ request()->url() }}" method="GET" class="row align-items-end mb-0">
                                         <div class="col-md-10 mb-2">
                                             <div class="input-group input-group-sm">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text bg-white border-right-0">
-                                                        <i class="fas fa-search text-muted"></i>
+                                                    <span class="input-group-text bg-transparent border-right-0 text-muted">
+                                                        <i class="fas fa-search"></i>
                                                     </span>
                                                 </div>
                                                 <input type="text" name="search" id="search" class="form-control border-left-0" placeholder="Cari PR Number, Tujuan, atau Nama Item..." value="{{ request('search') }}">
@@ -123,7 +120,7 @@
 
 
                     <div class="table-responsive">
-                        <table class="table table-bordered table-striped">
+                        <table class="table table-hover table-borderless text-sm">
                             <thead>
                                 <tr>
                                     <th>PR Number</th>
@@ -144,6 +141,11 @@
                                     <td>
                                         @php
                                             $status = $pr->approval_status;
+                                            $totalItems = $pr->items->count();
+                                            $approvedItems = $pr->items->filter(function ($item) {
+                                                return in_array($item->status, ['approved_om', 'approved_gm', 'approved_proc', 'ordered', 'delivered', 'completed']);
+                                            })->count();
+
                                             $badgeClass = match($status) {
                                                 'Draft' => 'badge-secondary',
                                                 'Pending' => 'badge-warning',
@@ -156,8 +158,20 @@
                                                 'Completed' => 'badge-success',
                                                 default => 'badge-secondary'
                                             };
+
+                                            $progressClass = 'badge-secondary';
+                                            if ($totalItems > 0 && $approvedItems === $totalItems) {
+                                                $progressClass = 'badge-success';
+                                            } elseif ($approvedItems > 0) {
+                                                $progressClass = 'badge-info';
+                                            }
                                         @endphp
                                         <span class="badge {{ $badgeClass }}">{{ $status }}</span>
+                                        @if($totalItems > 0)
+                                            <div class="mt-1">
+                                                <span class="badge {{ $progressClass }}">{{ $approvedItems }}/{{ $totalItems }} approved</span>
+                                            </div>
+                                        @endif
                                     </td>
                                     </td>
                                     <td>
@@ -172,7 +186,7 @@
                                         @endif
 
                                         @if(auth()->id() == $pr->user_id && $pr->isDeletable())
-                                        <form action="{{ route('purchase-requests.destroy', $pr) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this PR?');">
+                                        <form action="{{ route('purchase-requests.destroy', $pr) }}" method="POST" class="d-inline form-confirm" data-message="Delete this PR?">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-danger btn-xs" title="Delete">

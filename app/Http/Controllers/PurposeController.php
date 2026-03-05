@@ -7,9 +7,16 @@ use Illuminate\Http\Request;
 
 class PurposeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $purposes = Purpose::all();
+        $purposes = Purpose::query()
+            ->when($request->filled('search'), function ($query) use ($request) {
+                $query->where('name', 'like', '%' . $request->search . '%');
+            })
+            ->orderBy('name')
+            ->paginate(15)
+            ->withQueryString();
+
         return view('purposes.index', compact('purposes'));
     }
 

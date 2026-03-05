@@ -9,7 +9,17 @@ class UomController extends Controller
 {
     public function index()
     {
-        $uoms = Uom::paginate(10);
+        $search = request('search');
+
+        $uoms = Uom::query()
+            ->when($search, function ($query) use ($search) {
+                $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            })
+            ->orderBy('name')
+            ->paginate(10)
+            ->withQueryString();
+
         return view('settings.uom.index', compact('uoms'));
     }
 

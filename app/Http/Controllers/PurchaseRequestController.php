@@ -33,24 +33,12 @@ class PurchaseRequestController extends Controller
             ->where('status', '!=', 'draft');
 
         
-        if ($user->hasRole('user')) {
+        if ($user->hasRole('user') || $user->hasAnyRole(['operational_manager', 'general_manager'])) {
             $query->where('user_id', $user->id);
         }
 
         // Search
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('pr_number', 'like', "%{$search}%")
-                  ->orWhere('purpose', 'like', "%{$search}%")
-                  ->orWhereHas('user', function($qu) use ($search) {
-                      $qu->where('name', 'like', "%{$search}%");
-                  })
-                  ->orWhereHas('items', function($qi) use ($search) {
-                      $qi->where('item_name', 'like', "%{$search}%");
-                  });
-            });
-        }
+        $this->applySearchFilter($query, $request->search);
 
         // Awaiting Approval Filter
         if ($request->boolean('awaiting_approval')) {
@@ -212,7 +200,8 @@ class PurchaseRequestController extends Controller
         $departments = Department::where('is_active', true)->get();
         $uoms = Uom::all();
         $purposes = Purpose::all();
-        return view('purchase_requests.edit', compact('purchaseRequest', 'departments', 'uoms', 'purposes'));
+        $isPending = $purchaseRequest->status === 'pending';
+        return view('purchase_requests.edit', compact('purchaseRequest', 'departments', 'uoms', 'purposes', 'isPending'));
     }
 
 
@@ -297,11 +286,20 @@ class PurchaseRequestController extends Controller
             }
         }
 
-        // Optional: Remove items that were rejected but NOT submitted in the revision 
-        // (meaning user wants to remove those rejected items)
+        // Remove items that are NOT present in the submission (deleted by user)
+        // We only delete items that are safely deletable (pending, rejected, or if PR is draft)
+        // We protect approved/processed items from being deleted
         $purchaseRequest->items()
-            ->whereIn('status', ['rejected_om', 'rejected_gm', 'rejected_proc'])
             ->whereNotIn('id', $submittedItemIds)
+            ->where(function($q) use ($purchaseRequest) {
+                // If the PR itself is a draft, we can delete any item belonging to it
+                if ($purchaseRequest->status === 'draft') {
+                    return;
+                }
+                
+                // Otherwise only delete pending or rejected items
+                $q->whereIn('status', ['pending', 'rejected_om', 'rejected_gm', 'rejected_proc']);
+            })
             ->delete();
 
         // Recalculate total amount (though currently 0 as per user request to remove prices)
@@ -360,9 +358,13 @@ class PurchaseRequestController extends Controller
 
     public function approveItem(Request $request, PrItem $item)
     {
+        $request->validate([
+            'notes' => 'nullable|string|max:1000',
+        ]);
+
         $user = Auth::user();
         
-        if ($user->hasRole('operational_manager') && $item->status === 'pending') {
+        if (($user->hasRole('operational_manager') || $user->hasRole('superadmin')) && $item->status === 'pending') {
             $item->update(['status' => 'approved_om']);
             
             Approval::create([
@@ -391,10 +393,14 @@ class PurchaseRequestController extends Controller
             
             // Notify requester + Superadmins + Department OM
             $recipients = $this->getSharedRecipients($item->purchaseRequest->department_id, $item->purchaseRequest->user);
-            Notification::send($recipients, new PrStatusUpdatedNotification($item->purchaseRequest, "Item '{$item->item_name}' telah disetujui oleh Operational Manager."));
+            $message = "Item '{$item->item_name}' telah disetujui oleh Operational Manager.";
+            if ($request->filled('notes')) {
+                $message .= " Catatan: {$request->notes}";
+            }
+            Notification::send($recipients, new PrStatusUpdatedNotification($item->purchaseRequest, $message));
 
             
-        } elseif ($user->hasRole('general_manager') && $item->status === 'approved_om') {
+        } elseif (($user->hasRole('general_manager') || $user->hasRole('superadmin')) && $item->status === 'approved_om') {
             $item->update(['status' => 'approved_gm']);
             
             Approval::create([
@@ -414,7 +420,11 @@ class PurchaseRequestController extends Controller
 
             // Notify requester + Superadmins + Department OM
             $recipients = $this->getSharedRecipients($item->purchaseRequest->department_id, $item->purchaseRequest->user);
-            Notification::send($recipients, new PrStatusUpdatedNotification($item->purchaseRequest, "Item '{$item->item_name}' telah disetujui oleh General Manager."));
+            $message = "Item '{$item->item_name}' telah disetujui oleh General Manager.";
+            if ($request->filled('notes')) {
+                $message .= " Catatan: {$request->notes}";
+            }
+            Notification::send($recipients, new PrStatusUpdatedNotification($item->purchaseRequest, $message));
 
             if ($allApproved) {
                 $item->purchaseRequest->update(['status' => 'approved_gm']);
@@ -425,12 +435,16 @@ class PurchaseRequestController extends Controller
             }
 
             
-        } elseif ($user->hasRole('procurement') && $item->status === 'approved_gm') {
+        } elseif (($user->hasRole('procurement') || $user->hasRole('superadmin')) && $item->status === 'approved_gm') {
             $item->update(['status' => 'approved_proc']);
             
             // Notify requester + Superadmins + Department OM
             $recipients = $this->getSharedRecipients($item->purchaseRequest->department_id, $item->purchaseRequest->user);
-            Notification::send($recipients, new PrStatusUpdatedNotification($item->purchaseRequest, "Item '{$item->item_name}' telah disetujui oleh Procurement."));
+            $message = "Item '{$item->item_name}' telah disetujui oleh Procurement.";
+            if ($request->filled('notes')) {
+                $message .= " Catatan: {$request->notes}";
+            }
+            Notification::send($recipients, new PrStatusUpdatedNotification($item->purchaseRequest, $message));
 
             Approval::create([
 
@@ -458,14 +472,21 @@ class PurchaseRequestController extends Controller
 
     public function rejectItem(Request $request, PrItem $item)
     {
+        $request->validate([
+            'reject_reason' => 'required|string|max:1000',
+        ]);
+
         $user = Auth::user();
         
-        if ($user->hasRole('operational_manager') && $item->status === 'pending') {
+        if (($user->hasRole('operational_manager') || $user->hasRole('superadmin')) && $item->status === 'pending') {
             $status = 'rejected_om';
-        } elseif ($user->hasRole('general_manager') && $item->status === 'approved_om') {
+            $approverRole = 'operational_manager';
+        } elseif (($user->hasRole('general_manager') || $user->hasRole('superadmin')) && $item->status === 'approved_om') {
             $status = 'rejected_gm';
-        } elseif ($user->hasRole('procurement') && $item->status === 'approved_gm') {
+            $approverRole = 'general_manager';
+        } elseif (($user->hasRole('procurement') || $user->hasRole('superadmin')) && $item->status === 'approved_gm') {
             $status = 'rejected_proc';
+            $approverRole = 'procurement';
         } else {
             return redirect()->back()->with('error', 'Invalid rejection action.');
         }
@@ -479,7 +500,7 @@ class PurchaseRequestController extends Controller
 
         // Notify requester + Superadmins + Department OM
         $recipients = $this->getSharedRecipients($item->purchaseRequest->department_id, $item->purchaseRequest->user);
-        Notification::send($recipients, new PrStatusUpdatedNotification($item->purchaseRequest, "Item '{$item->item_name}' ditolak. Alasan: " . $request->reject_reason));
+        Notification::send($recipients, new PrStatusUpdatedNotification($item->purchaseRequest, "Item '{$item->item_name}' ditolak. Catatan validasi: " . $request->reject_reason));
 
 
 
@@ -487,7 +508,7 @@ class PurchaseRequestController extends Controller
             'purchase_request_id' => $item->purchase_request_id,
             'pr_item_id' => $item->id,
             'approver_id' => $user->id,
-            'approver_role' => $user->getRoleNames()->first(),
+            'approver_role' => $approverRole,
             'approval_type' => str_replace('rejected_', '', $status),
             'status' => 'rejected',
             'notes' => $request->reject_reason,
@@ -504,6 +525,74 @@ class PurchaseRequestController extends Controller
         }
 
         return redirect()->back()->with('success', 'Item rejected successfully.');
+    }
+
+    public function sendValidationNote(Request $request, PrItem $item)
+    {
+        $request->validate([
+            'notes' => 'required|string|max:1000',
+        ]);
+
+        $user = Auth::user();
+        $role = $user->getRoleNames()->first();
+
+        $canSend = false;
+    $approvalType = 'unknown';
+    
+    if ($item->purchaseRequest->user_id == $user->id) {
+        $canSend = true;
+        $approvalType = 'requester';
+    } elseif ($role === 'superadmin' && $item->status === 'pending') {
+        $canSend = true;
+        $approvalType = 'om';
+        $role = 'operational_manager';
+    } elseif ($role === 'superadmin' && $item->status === 'approved_om') {
+        $canSend = true;
+        $approvalType = 'gm';
+        $role = 'general_manager';
+    } elseif ($role === 'superadmin' && $item->status === 'approved_gm') {
+        $canSend = true;
+        $approvalType = 'procurement';
+        $role = 'procurement';
+    } elseif ($role === 'operational_manager' && $item->status === 'pending') {
+        $canSend = true;
+        $approvalType = 'om';
+    } elseif ($role === 'general_manager' && $item->status === 'approved_om') {
+        $canSend = true;
+        $approvalType = 'gm';
+    } elseif ($role === 'procurement' && $item->status === 'approved_gm') {
+        $canSend = true;
+        $approvalType = 'procurement';
+    }
+
+        if (!$canSend) {
+            return redirect()->back()->with('error', 'Anda tidak dapat mengirim catatan pada status item ini.');
+        }
+
+        Approval::create([
+            'purchase_request_id' => $item->purchase_request_id,
+            'pr_item_id' => $item->id,
+            'approver_id' => $user->id,
+            'approver_role' => $role,
+            'approval_type' => $approvalType,
+            'status' => 'pending',
+            'notes' => $request->notes,
+            'approved_at' => now(),
+        ]);
+
+        $recipients = $this->getSharedRecipients($item->purchaseRequest->department_id, $item->purchaseRequest->user);
+        
+        $senderName = $approvalType === 'requester' ? "Requester ({$user->name})" : strtoupper(str_replace('_', ' ', $role));
+        
+        Notification::send(
+            $recipients,
+            new PrStatusUpdatedNotification(
+                $item->purchaseRequest,
+                "Catatan untuk item '{$item->item_name}' dari " . $senderName . ": {$request->notes}"
+            )
+        );
+
+        return redirect()->back()->with('success', 'Catatan berhasil dikirim.');
     }
 
     public function reviseItem(Request $request, PrItem $item)
@@ -694,7 +783,7 @@ class PurchaseRequestController extends Controller
         return redirect()->back()->with('success', 'Item status updated successfully.');
     }
 
-    public function rejected()
+    public function rejected(Request $request)
     {
         $this->authorize('view pr');
         $user = Auth::user();
@@ -708,14 +797,16 @@ class PurchaseRequestController extends Controller
             $query->where('user_id', $user->id);
         }
 
-        $purchaseRequests = $query->orderBy('created_at', 'desc')->paginate(10);
+        $this->applySearchFilter($query, $request->search);
+
+        $purchaseRequests = $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
         $departments = Department::all();
         $title = "Rejected Purchase Requests";
 
         return view('purchase_requests.index', compact('purchaseRequests', 'departments', 'title'));
     }
 
-    public function drafts()
+    public function drafts(Request $request)
     {
         $this->authorize('view pr');
         $user = Auth::user();
@@ -727,11 +818,45 @@ class PurchaseRequestController extends Controller
             $query->where('user_id', $user->id);
         }
 
-        $purchaseRequests = $query->orderBy('updated_at', 'desc')->paginate(10);
+        $this->applySearchFilter($query, $request->search);
+
+        $purchaseRequests = $query->orderBy('updated_at', 'desc')->paginate(10)->withQueryString();
         $departments = Department::all();
         $title = "Draft Purchase Requests";
 
         return view('purchase_requests.index', compact('purchaseRequests', 'departments', 'title'));
+    }
+
+    public function approvalQueue(Request $request)
+    {
+        $this->authorize('view pr');
+        $user = Auth::user();
+
+        $query = PurchaseRequest::with(['user', 'department', 'items'])
+            ->where('status', '!=', 'draft');
+
+        if ($user->hasRole('superadmin')) {
+            $query->whereIn('status', ['pending', 'approved_om']);
+        } elseif ($user->hasRole('operational_manager')) {
+            $query->where('status', 'pending');
+        } elseif ($user->hasRole('general_manager')) {
+            $query->where('status', 'approved_om');
+        } else {
+            abort(403);
+        }
+
+        $this->applySearchFilter($query, $request->search);
+
+        if ($request->filled('department_id')) {
+            $query->where('department_id', $request->department_id);
+        }
+
+        $purchaseRequests = $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
+        $departments = Department::all();
+        $title = 'Approval Queue (OM/GM)';
+        $hideCreateButton = true;
+
+        return view('purchase_requests.index', compact('purchaseRequests', 'departments', 'title', 'hideCreateButton'));
     }
 
     public function checkNotifications()
@@ -786,6 +911,29 @@ class PurchaseRequestController extends Controller
         ]);
 
         return $filtered;
+    }
+
+    private function applySearchFilter($query, $search): void
+    {
+        if (!$search) {
+            return;
+        }
+
+        $query->where(function ($q) use ($search) {
+            $q->where('pr_number', 'like', "%{$search}%")
+                ->orWhere('purpose', 'like', "%{$search}%")
+                ->orWhereHas('user', function ($qu) use ($search) {
+                    $qu->where('name', 'like', "%{$search}%");
+                })
+                ->orWhereHas('department', function ($qd) use ($search) {
+                    $qd->where('name', 'like', "%{$search}%")
+                        ->orWhere('code', 'like', "%{$search}%");
+                })
+                ->orWhereHas('items', function ($qi) use ($search) {
+                    $qi->where('item_name', 'like', "%{$search}%")
+                        ->orWhere('uom', 'like', "%{$search}%");
+                });
+        });
     }
 
 }

@@ -18,7 +18,18 @@ class NotificationController extends Controller
         $notification = auth()->user()->notifications()->findOrFail($id);
         $notification->markAsRead();
 
-        return redirect($notification->data['url'] ?? route('notifications.index'));
+        $targetUrl = $notification->data['url'] ?? route('notifications.index');
+        
+        // If the URL exists, extract only the path to avoid 404 errors
+        // caused by mismatched hosts (e.g., if .env APP_URL is localhost but user accesses via IP or .test)
+        if (isset($notification->data['url'])) {
+            $parsedUrl = parse_url($targetUrl);
+            $path = $parsedUrl['path'] ?? '';
+            $query = isset($parsedUrl['query']) ? '?' . $parsedUrl['query'] : '';
+            $targetUrl = $path . $query;
+        }
+
+        return redirect($targetUrl);
     }
 
     public function markAllAsRead()

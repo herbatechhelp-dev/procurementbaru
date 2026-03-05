@@ -58,16 +58,22 @@ class DatabaseSeeder extends Seeder
         $superadmin->givePermissionTo(Permission::all());
 
         $operationalManager->givePermissionTo([
+            'create pr',
             'view pr',
+            'edit pr',
             'approve pr',
             'reject pr',
+            'export pr',
             'view dashboard',
         ]);
 
         $generalManager->givePermissionTo([
+            'create pr',
             'view pr',
+            'edit pr',
             'approve pr',
             'reject pr',
+            'export pr',
             'view dashboard',
         ]);
 

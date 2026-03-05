@@ -23,10 +23,9 @@
             <div>
                 <a href="/">
                     @if(isset($appLogo) && $appLogo)
-                        <img src="{{ asset('storage/' . $appLogo) }}" alt="Logo" class="w-20 h-20 object-contain">
-                    @else
-                        <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
+                        <img src="{{ asset('storage/' . $appLogo) }}" alt="Logo" class="w-20 h-20 object-contain mx-auto">
                     @endif
+                    <h1 class="text-2xl font-bold text-center text-gray-800 mt-2">{{ $appName ?? config('app.name', 'Laravel') }}</h1>
                 </a>
             </div>
 

@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use App\Models\PurchaseRequest;
 
+
 class PrSubmittedNotification extends Notification
 {
     use Queueable;
@@ -19,7 +20,7 @@ class PrSubmittedNotification extends Notification
 
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return ['database', 'mail'];
     }
 
     public function toArray(object $notifiable): array
@@ -34,4 +35,13 @@ class PrSubmittedNotification extends Notification
         ];
     }
 
+    public function toMail(object $notifiable)
+    {
+        return (new \Illuminate\Notifications\Messages\MailMessage)
+                    ->subject('PR Baru Diajukan: ' . $this->purchaseRequest->pr_number)
+                    ->greeting('Halo,')
+                    ->line("PR Baru {$this->purchaseRequest->pr_number} telah diajukan oleh {$this->purchaseRequest->user->name}.")
+                    ->action('Lihat Detail PR', route('purchase-requests.show', $this->purchaseRequest->id))
+                    ->line('Terima kasih telah menggunakan PR System.');
+    }
 }

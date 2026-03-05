@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use App\Models\PurchaseRequest;
 
+
 class PrActionRequiredNotification extends Notification
 {
     use Queueable;
@@ -21,7 +22,7 @@ class PrActionRequiredNotification extends Notification
 
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return ['database', 'mail'];
     }
 
     public function toArray(object $notifiable): array
@@ -33,5 +34,15 @@ class PrActionRequiredNotification extends Notification
             'type' => 'action_required',
             'url' => route('purchase-requests.show', $this->purchaseRequest->id),
         ];
+    }
+
+    public function toMail(object $notifiable)
+    {
+        return (new \Illuminate\Notifications\Messages\MailMessage)
+                    ->subject('Butuh Tindakan: PR ' . $this->purchaseRequest->pr_number)
+                    ->greeting('Tindakan Diperlukan,')
+                    ->line($this->message)
+                    ->action('Tinjau PR Sekarang', route('purchase-requests.show', $this->purchaseRequest->id))
+                    ->line('Harap segera memproses permintaan ini.');
     }
 }

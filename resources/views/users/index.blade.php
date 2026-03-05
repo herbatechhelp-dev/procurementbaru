@@ -14,14 +14,12 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    @if(session('success'))
-                        <div class="alert alert-success">{{ session('success') }}</div>
-                    @endif
+            <div class="card shadow-sm rounded-lg">
+                <div class="card-body p-4">
+
 
                     <div class="table-responsive">
-                        <table class="table table-bordered table-striped">
+                        <table class="table table-hover table-borderless">
                             <thead>
                                 <tr>
                                     <th>ID</th>
@@ -58,7 +56,7 @@
                                         @endcan
                                         
                                         @can('delete users')
-                                        <form action="{{ route('users.destroy', $user) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure?')">
+                                        <form action="{{ route('users.destroy', $user) }}" method="POST" class="d-inline form-confirm" data-message="Are you sure?">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-danger btn-xs">

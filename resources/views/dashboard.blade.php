@@ -9,96 +9,112 @@
     <div class="row">
         @if(Auth::user()->hasRole('superadmin'))
             <div class="col-lg-3 col-6">
-                <div class="small-box bg-info">
-                    <div class="inner">
-                        <h3>{{ $stats['total_pr'] }}</h3>
-                        <p>Total Purchase Requests</p>
+                <div class="card bg-info p-3 mb-4 rounded-lg shadow-sm">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-uppercase text-xs font-weight-bold mb-1 opacity-75">Total Purchase Requests</p>
+                            <h3 class="mb-0 font-weight-bolder">{{ $stats['total_pr'] }}</h3>
+                        </div>
+                        <div class="icon bg-white bg-opacity-25 rounded-circle p-2">
+                            <i class="fas fa-file-invoice-dollar fa-fw"></i>
+                        </div>
                     </div>
-                    <div class="icon">
-                        <i class="fas fa-file-invoice-dollar"></i>
-                    </div>
-                    <a href="{{ route('purchase-requests.index') }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                    <a href="{{ route('purchase-requests.index') }}" class="small-box-footer mt-3 d-block text-sm text-white opacity-75 hover-opacity-100">View All <i class="fas fa-arrow-right ml-1"></i></a>
                 </div>
             </div>
             <div class="col-lg-3 col-6">
-               <div class="small-box bg-warning">
-                    <div class="inner">
-                        <h3>{{ $stats['pending_pr'] }}</h3>
-                        <p>Pending Approval</p>
+                <div class="card bg-warning p-3 mb-4 rounded-lg shadow-sm">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-uppercase text-xs font-weight-bold mb-1 opacity-75">Pending Approval</p>
+                            <h3 class="mb-0 font-weight-bolder">{{ $stats['pending_pr'] }}</h3>
+                        </div>
+                        <div class="icon bg-dark bg-opacity-25 rounded-circle p-2">
+                            <i class="fas fa-clock fa-fw"></i>
+                        </div>
                     </div>
-                    <div class="icon">
-                        <i class="fas fa-clock"></i>
-                    </div>
-                    <a href="{{ route('purchase-requests.index', ['status' => 'pending']) }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                    <a href="{{ route('purchase-requests.index', ['status' => 'pending']) }}" class="small-box-footer mt-3 d-block text-sm opacity-75 hover-opacity-100">Review Now <i class="fas fa-arrow-right ml-1"></i></a>
                 </div>
             </div>
             <div class="col-lg-3 col-6">
-                <div class="small-box bg-success">
-                    <div class="inner">
-                        <h3>{{ $stats['total_users'] }}</h3>
-                        <p>Total Users</p>
+                <div class="card bg-success p-3 mb-4 rounded-lg shadow-sm">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-uppercase text-xs font-weight-bold mb-1 opacity-75">Total Users</p>
+                            <h3 class="mb-0 font-weight-bolder">{{ $stats['total_users'] }}</h3>
+                        </div>
+                        <div class="icon bg-white bg-opacity-25 rounded-circle p-2">
+                            <i class="fas fa-users fa-fw"></i>
+                        </div>
                     </div>
-                    <div class="icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <a href="{{ route('users.index') }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                    <a href="{{ route('users.index') }}" class="small-box-footer mt-3 d-block text-sm text-white opacity-75 hover-opacity-100">Manage Users <i class="fas fa-arrow-right ml-1"></i></a>
                 </div>
             </div>
             <div class="col-lg-3 col-6">
-                <div class="small-box bg-secondary">
-                    <div class="inner">
-                        <h3>{{ $stats['total_departments'] }}</h3>
-                        <p>Departments</p>
+                <div class="card bg-secondary p-3 mb-4 rounded-lg shadow-sm">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-uppercase text-xs font-weight-bold mb-1 opacity-75">Departments</p>
+                            <h3 class="mb-0 font-weight-bolder">{{ $stats['total_departments'] }}</h3>
+                        </div>
+                        <div class="icon bg-white bg-opacity-25 rounded-circle p-2">
+                            <i class="fas fa-building fa-fw"></i>
+                        </div>
                     </div>
-                    <div class="icon">
-                        <i class="fas fa-building"></i>
-                    </div>
-                    <a href="{{ route('departments.index') }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                    <a href="{{ route('departments.index') }}" class="small-box-footer mt-3 d-block text-sm text-white opacity-75 hover-opacity-100">Manage Depts <i class="fas fa-arrow-right ml-1"></i></a>
                 </div>
             </div>
 
         @elseif(Auth::user()->hasRole('user'))
              <div class="col-lg-3 col-6">
-                <div class="small-box bg-info">
-                    <div class="inner">
-                        <h3>{{ $stats['my_pr'] }}</h3>
-                        <p>My Requests</p>
-                    </div>
-                    <div class="icon">
-                        <i class="fas fa-file-alt"></i>
-                    </div>
-                </div>
-            </div>
-             <div class="col-lg-3 col-6">
-                <div class="small-box bg-warning">
-                    <div class="inner">
-                        <h3>{{ $stats['pending_pr'] }}</h3>
-                        <p>Pending</p>
-                    </div>
-                    <div class="icon">
-                        <i class="fas fa-hourglass-half"></i>
+                <div class="card bg-info p-3 mb-4 rounded-lg shadow-sm">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-uppercase text-xs font-weight-bold mb-1 opacity-75">My Requests</p>
+                            <h3 class="mb-0 font-weight-bolder">{{ $stats['my_pr'] }}</h3>
+                        </div>
+                        <div class="icon bg-white bg-opacity-25 rounded-circle p-2">
+                            <i class="fas fa-file-alt fa-fw"></i>
+                        </div>
                     </div>
                 </div>
             </div>
              <div class="col-lg-3 col-6">
-                <div class="small-box bg-success">
-                    <div class="inner">
-                        <h3>{{ $stats['approved_pr'] }}</h3>
-                        <p>Approved</p>
-                    </div>
-                    <div class="icon">
-                        <i class="fas fa-check-circle"></i>
+                <div class="card bg-warning p-3 mb-4 rounded-lg shadow-sm">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-uppercase text-xs font-weight-bold mb-1 opacity-75">Pending</p>
+                            <h3 class="mb-0 font-weight-bolder">{{ $stats['pending_pr'] }}</h3>
+                        </div>
+                        <div class="icon bg-dark bg-opacity-25 rounded-circle p-2">
+                            <i class="fas fa-hourglass-half fa-fw"></i>
+                        </div>
                     </div>
                 </div>
             </div>
              <div class="col-lg-3 col-6">
-                <div class="small-box bg-danger">
-                    <div class="inner">
-                        <h3>{{ $stats['rejected_pr'] }}</h3>
-                        <p>Rejected</p>
+                <div class="card bg-success p-3 mb-4 rounded-lg shadow-sm">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-uppercase text-xs font-weight-bold mb-1 opacity-75">Approved</p>
+                            <h3 class="mb-0 font-weight-bolder">{{ $stats['approved_pr'] }}</h3>
+                        </div>
+                        <div class="icon bg-white bg-opacity-25 rounded-circle p-2">
+                            <i class="fas fa-check-circle fa-fw"></i>
+                        </div>
                     </div>
-                    <div class="icon">
-                        <i class="fas fa-times-circle"></i>
+                </div>
+            </div>
+             <div class="col-lg-3 col-6">
+                <div class="card bg-danger p-3 mb-4 rounded-lg shadow-sm">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-uppercase text-xs font-weight-bold mb-1 opacity-75">Rejected</p>
+                            <h3 class="mb-0 font-weight-bolder">{{ $stats['rejected_pr'] }}</h3>
+                        </div>
+                        <div class="icon bg-white bg-opacity-25 rounded-circle p-2">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -106,36 +122,42 @@
         @else
              <!-- Managers -->
              <div class="col-lg-3 col-6">
-                <div class="small-box bg-primary">
-                    <div class="inner">
-                        <h3>{{ $stats['pr_to_review'] }}</h3>
-                        <p>PR to Review</p>
+                <div class="card bg-primary p-3 mb-4 rounded-lg shadow-sm">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-uppercase text-xs font-weight-bold mb-1 opacity-75">PR to Review</p>
+                            <h3 class="mb-0 font-weight-bolder">{{ $stats['pr_to_review'] }}</h3>
+                        </div>
+                        <div class="icon bg-white bg-opacity-25 rounded-circle p-2">
+                            <i class="fas fa-clipboard-check fa-fw"></i>
+                        </div>
                     </div>
-                    <div class="icon">
-                        <i class="fas fa-clipboard-check"></i>
-                    </div>
-                    <a href="{{ route('purchase-requests.index', ['status' => 'pending']) }}" class="small-box-footer">Review Now <i class="fas fa-arrow-circle-right"></i></a>
+                    <a href="{{ route('purchase-requests.index', ['status' => 'pending']) }}" class="small-box-footer mt-3 d-block text-sm text-white opacity-75 hover-opacity-100">Review Now <i class="fas fa-arrow-right ml-1"></i></a>
                 </div>
             </div>
              <div class="col-lg-3 col-6">
-                <div class="small-box bg-info">
-                    <div class="inner">
-                        <h3>{{ $stats['total_pr'] }}</h3>
-                        <p>Total PR in System</p>
-                    </div>
-                    <div class="icon">
-                        <i class="fas fa-list"></i>
+                <div class="card bg-info p-3 mb-4 rounded-lg shadow-sm">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-uppercase text-xs font-weight-bold mb-1 opacity-75">Total PR in System</p>
+                            <h3 class="mb-0 font-weight-bolder">{{ $stats['total_pr'] }}</h3>
+                        </div>
+                        <div class="icon bg-white bg-opacity-25 rounded-circle p-2">
+                            <i class="fas fa-list fa-fw"></i>
+                        </div>
                     </div>
                 </div>
             </div>
              <div class="col-lg-3 col-6">
-                <div class="small-box bg-success">
-                    <div class="inner">
-                        <h3>{{ $stats['approved_today'] }}</h3>
-                        <p>Approved Today</p>
-                    </div>
-                    <div class="icon">
-                        <i class="fas fa-calendar-check"></i>
+                <div class="card bg-success p-3 mb-4 rounded-lg shadow-sm">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-uppercase text-xs font-weight-bold mb-1 opacity-75">Approved Today</p>
+                            <h3 class="mb-0 font-weight-bolder">{{ $stats['approved_today'] }}</h3>
+                        </div>
+                        <div class="icon bg-white bg-opacity-25 rounded-circle p-2">
+                            <i class="fas fa-calendar-check fa-fw"></i>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -186,7 +208,7 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                       <table class="table table-bordered table-striped">
+                       <table class="table table-hover table-borderless text-sm">
                             <thead>
                                 <tr>
                                     <th>PR Number</th>
@@ -250,13 +272,19 @@
                     datasets: [{
                         data: {!! json_encode($chartData['status_distribution']['data']) !!},
                         backgroundColor: ['#6c757d', '#ffc107', '#dc3545', '#17a2b8', '#28a745'],
+                        borderWidth: 0,
                     }]
                 },
                 options: {
                     maintainAspectRatio: false,
                     responsive: true,
-                    legend: {
-                        position: 'bottom'
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#a0aec0' 
+                            }
+                        }
                     }
                 }
             });
@@ -270,20 +298,43 @@
                     datasets: [{
                         label: 'Purchase Requests',
                         data: {!! json_encode($chartData['monthly_trends']['data']) !!},
-                        borderColor: '#28a745',
-                        backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                        borderColor: '#2563eb', // Blue Primary
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        borderWidth: 2,
                         fill: true,
-                        tension: 0.1
+                        tension: 0.3,
+                        pointBackgroundColor: '#2563eb',
                     }]
                 },
                 options: {
                     maintainAspectRatio: false,
                     responsive: true,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#a0aec0'
+                            }
+                        }
+                    },
                     scales: {
                         y: {
                             beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)',
+                                drawBorder: false
+                            },
                             ticks: {
-                                stepSize: 1
+                                stepSize: 1,
+                                color: '#a0aec0'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false,
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: '#a0aec0'
                             }
                         }
                     }

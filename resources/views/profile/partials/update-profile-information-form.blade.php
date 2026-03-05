@@ -1,10 +1,10 @@
 <section>
     <header>
-        <h2 class="text-lg font-medium text-gray-900">
+        <h2 class="text-lg font-medium">
             {{ __('Profile Information') }}
         </h2>
 
-        <p class="mt-1 text-sm text-gray-600">
+        <p class="mt-1 text-sm opacity-75">
             {{ __("Update your account's profile information and email address.") }}
         </p>
     </header>
@@ -13,7 +13,7 @@
         @csrf
     </form>
 
-    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6">
+    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6" enctype="multipart/form-data">
         @csrf
         @method('patch')
 
@@ -30,10 +30,10 @@
 
             @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
                 <div>
-                    <p class="text-sm mt-2 text-gray-800">
+                    <p class="text-sm mt-2 opacity-75">
                         {{ __('Your email address is unverified.') }}
 
-                        <button form="send-verification" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        <button form="send-verification" class="underline text-sm opacity-75 hover:opacity-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                             {{ __('Click here to re-send the verification email.') }}
                         </button>
                     </p>
@@ -43,6 +43,19 @@
                             {{ __('A new verification link has been sent to your email address.') }}
                         </p>
                     @endif
+                </div>
+            @endif
+        </div>
+
+        <div>
+            <x-input-label for="signature_file" :value="__('Requester Signature (PNG/JPG)')" />
+            <input id="signature_file" name="signature_file" type="file" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" accept="image/png,image/jpeg,image/jpg" />
+            <x-input-error class="mt-2" :messages="$errors->get('signature_file')" />
+
+            @if($user->signature_path)
+                <div class="mt-3">
+                    <p class="text-sm opacity-75 mb-2">Current signature:</p>
+                    <img src="{{ asset('storage/' . $user->signature_path) }}" alt="Signature" style="max-height: 80px; width: auto;" />
                 </div>
             @endif
         </div>

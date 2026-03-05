@@ -40,6 +40,9 @@ Route::middleware('auth')->group(function () {
     // Purchase Requests
     Route::get('purchase-requests/rejected', [PurchaseRequestController::class, 'rejected'])->name('purchase-requests.rejected');
     Route::get('purchase-requests/drafts', [PurchaseRequestController::class, 'drafts'])->name('purchase-requests.drafts');
+    Route::get('purchase-requests/approvals', [PurchaseRequestController::class, 'approvalQueue'])
+        ->middleware('role:operational_manager|general_manager|superadmin')
+        ->name('purchase-requests.approvals');
     Route::resource('purchase-requests', PurchaseRequestController::class);
 
 
@@ -49,6 +52,7 @@ Route::middleware('auth')->group(function () {
 
     Route::post('purchase-requests/{item}/approve', [PurchaseRequestController::class, 'approveItem'])->name('purchase-requests.approve-item');
     Route::post('purchase-requests/{item}/reject', [PurchaseRequestController::class, 'rejectItem'])->name('purchase-requests.reject-item');
+    Route::post('purchase-requests/{item}/send-note', [PurchaseRequestController::class, 'sendValidationNote'])->name('purchase-requests.send-note');
     Route::post('purchase-requests/{item}/revise', [PurchaseRequestController::class, 'reviseItem'])->name('purchase-requests.revise-item');
     Route::get('purchase-requests/{purchaseRequest}/preview', [PurchaseRequestController::class, 'preview'])->name('purchase-requests.preview');
     Route::get('purchase-requests/{purchaseRequest}/export', [PurchaseRequestController::class, 'export'])->name('purchase-requests.export');

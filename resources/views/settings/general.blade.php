@@ -7,13 +7,13 @@
 
     <div class="row">
         <div class="col-md-8">
-            <div class="card card-primary">
-                <div class="card-header">
-                    <h3 class="card-title">System Configuration</h3>
+            <div class="card shadow-sm rounded-lg">
+                <div class="card-header border-bottom-0 pb-0 pt-4 px-4">
+                    <h3 class="card-title text-lg font-medium"><i class="fas fa-cogs mr-2 text-primary"></i> System Configuration</h3>
                 </div>
                 <form action="{{ route('settings.update-general') }}" method="POST" enctype="multipart/form-data">
                     @csrf
-                    <div class="card-body">
+                    <div class="card-body px-4 pb-4">
                         <div class="form-group">
                             <label for="app_name">System Name</label>
                             <input type="text" name="app_name" class="form-control @error('app_name') is-invalid @enderror" id="app_name" value="{{ old('app_name', $settings['app_name']) }}" required>
@@ -126,11 +126,11 @@
         </div>
         
         <div class="col-md-4">
-            <div class="card card-info">
-                <div class="card-header">
-                    <h3 class="card-title">Information</h3>
+            <div class="card shadow-sm rounded-lg">
+                <div class="card-header border-bottom-0 pb-0 pt-4 px-4">
+                    <h3 class="card-title text-lg font-medium"><i class="fas fa-info-circle mr-2 text-info"></i> Information</h3>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-4">
                     <p>These settings will affect the entire application including:</p>
                     <ul>
                         <li>Sidebar Brand Name</li>

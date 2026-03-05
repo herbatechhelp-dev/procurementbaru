@@ -12,14 +12,21 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    @if(session('success'))
-                        <div class="alert alert-success">{{ session('success') }}</div>
-                    @endif
+            <div class="card shadow-sm rounded-lg">
+                <div class="card-body p-4">
+
+
+                    <form method="GET" action="{{ route('purposes.index') }}" class="row mb-3">
+                        <div class="col-md-10 mb-2 mb-md-0">
+                            <input type="text" name="search" class="form-control" placeholder="Search purpose name..." value="{{ request('search') }}">
+                        </div>
+                        <div class="col-md-2 d-flex gap-2">
+                            <button type="submit" class="btn btn-primary btn-block">Search</button>
+                        </div>
+                    </form>
 
                     <div class="table-responsive">
-                        <table class="table table-bordered table-striped">
+                        <table class="table table-hover table-borderless">
                             <thead>
                                 <tr>
                                     <th>ID</th>
@@ -29,7 +36,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($purposes as $purpose)
+                                @forelse($purposes as $purpose)
                                 <tr>
                                     <td>{{ $purpose->id }}</td>
                                     <td>{{ $purpose->name }}</td>
@@ -39,7 +46,7 @@
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         
-                                        <form action="{{ route('purposes.destroy', $purpose) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure?')">
+                                        <form action="{{ route('purposes.destroy', $purpose) }}" method="POST" class="d-inline form-confirm" data-message="Are you sure?">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-danger btn-xs">
@@ -48,9 +55,17 @@
                                         </form>
                                     </td>
                                 </tr>
-                                @endforeach
+                                @empty
+                                <tr>
+                                    <td colspan="4" class="text-center">No purpose found.</td>
+                                </tr>
+                                @endforelse
                             </tbody>
                         </table>
+                    </div>
+
+                    <div class="mt-3">
+                        {{ $purposes->links() }}
                     </div>
                 </div>
             </div>

@@ -12,7 +12,7 @@
                 @method('PUT')
                 
                 <!-- Main Info -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                <div class="card shadow-sm rounded-lg mb-6">
                     <div class="p-6 text-gray-900">
                         @if($purchaseRequest->hasRejectedItems())
                             <div class="alert alert-warning mb-4">
@@ -52,7 +52,7 @@
                 </div>
 
                 <!-- Items -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                <div class="card shadow-sm rounded-lg mb-6">
                     <div class="p-6 text-gray-900">
                         <div class="d-flex justify-content-between mb-4">
                             <h3 class="text-lg font-medium">Items</h3>
@@ -86,7 +86,7 @@
                                 <div class="locked-items-section mb-5">
                                     @foreach($lockedItems as $item)
                                         @php $index = $items->search($item); @endphp
-                                        <div class="card mb-3 bg-light border-light shadow-sm">
+                                        <div class="card mb-3 border-light shadow-sm" style="background-color: rgba(255,255,255,0.02)">
                                             <div class="card-body py-3">
                                                 <div class="d-flex justify-content-between align-items-center mb-0">
                                                     <h6 class="mb-0 font-weight-bold">
@@ -119,7 +119,7 @@
                                         $index = $items->search($item);
                                         $isRejected = str_starts_with($item->status, 'rejected');
                                     @endphp
-                                    <div class="card mb-3 item-row {{ $isRejected ? 'border-warning shadow-sm' : '' }}" id="item-row-{{ $index }}">
+                                    <div class="card mb-3 item-row {{ $isRejected ? 'border-warning shadow-sm' : 'border' }}" style="background-color: rgba(255,255,255,0.02)" id="item-row-{{ $index }}">
                                         <div class="card-body">
                                             <div class="d-flex justify-content-between mb-3">
                                                 <h5 class="card-title {{ $isRejected ? 'text-warning' : '' }} font-weight-bold">
@@ -146,9 +146,10 @@
                                                 </div>
                                                 <div class="col-md-2 mb-3">
                                                     <label class="form-label">UOM *</label>
-                                                    <select name="items[{{ $index }}][uom]" class="form-control" required>
+                                                    <select name="items[{{ $index }}][uom]" class="form-control tomselect-uom" required>
+                                                        <option value="">Select UOM</option>
                                                         @foreach($uoms as $uomOption)
-                                                            <option value="{{ $uomOption->name }}" {{ $item->uom == $uomOption->name ? 'selected' : '' }}>{{ $uomOption->name }}</option>
+                                                            <option value="{{ $uomOption->name }}" {{ old("items.{$index}.uom", $item->uom) == $uomOption->name ? 'selected' : '' }}>{{ $uomOption->name }}</option>
                                                         @endforeach
                                                     </select>
                                                 </div>
@@ -192,7 +193,7 @@
                     </div>
                 </div>
 
-                <div class="flex items-center gap-4">
+                <div class="form-actions-sticky mt-4">
                     <button type="submit" name="action" value="submit" class="btn btn-primary">Update and Submit</button>
                     <button type="submit" name="action" value="draft" class="btn btn-secondary">Save as Draft</button>
                     <a href="{{ route('purchase-requests.index') }}" class="btn btn-link text-gray-600">Cancel</a>
@@ -230,7 +231,7 @@
                                 </div>
                                 <div class="col-md-2 mb-3">
                                     <label class="form-label">UOM *</label>
-                                    <select name="items[${index}][uom]" class="form-control" required>
+                                    <select name="items[${index}][uom]" class="form-control tomselect-uom" required>
                                         <option value="">Select UOM</option>
                                         @foreach($uoms as $uom)
                                             <option value="{{ $uom->name }}">{{ $uom->name }}</option>
@@ -281,8 +282,48 @@
 
             addButton.addEventListener('click', function() {
                 container.insertAdjacentHTML('beforeend', createItemRow(itemIndex));
+                
+                // Initialize TomSelect for the newly created UOM dropdown
+                const newSelect = container.querySelector(`#item-row-${itemIndex} .tomselect-uom`);
+                if (newSelect) {
+                    new TomSelect(newSelect, {
+                        create: true,
+                        sortField: {
+                            field: "text",
+                            direction: "asc"
+                        },
+                        placeholder: "Select UOM"
+                    });
+                }
                 itemIndex++;
             });
+
+            // Initialize existing UOM dropdowns
+            document.querySelectorAll('.tomselect-uom').forEach((el) => {
+                if(!el.classList.contains('tomselected')) {
+                    new TomSelect(el, {
+                        create: true,
+                        sortField: {
+                            field: "text",
+                            direction: "asc"
+                        },
+                        placeholder: "Select UOM"
+                    });
+                }
+            });
+
+            // Initialize Purpose Dropdown
+            const purposeSelect = document.getElementById('purpose');
+            if (purposeSelect && !purposeSelect.disabled) {
+                new TomSelect(purposeSelect, {
+                    create: true,
+                    sortField: {
+                        field: "text",
+                        direction: "asc"
+                    },
+                    placeholder: "Select Purpose"
+                });
+            }
 
             container.addEventListener('click', function(e) {
                 if (e.target.closest('.remove-item')) {
@@ -297,4 +338,44 @@
             });
         });
     </script>
+    <style>
+        /* To prevent TomSelect dropdown cutoff inside cards */
+        .card-body {
+            overflow: visible !important;
+        }
+        .bg-white {
+            overflow: visible !important; 
+        }
+
+        @media (max-width: 768px) {
+            .form-actions-sticky {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: white;
+                padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom));
+                box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
+                z-index: 1030;
+                display: flex;
+                gap: 0.5rem;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            .form-actions-sticky .btn {
+                flex: 1 1 auto;
+                margin: 0 !important;
+            }
+            .pb-12 {
+                padding-bottom: calc(5rem + env(safe-area-inset-bottom)) !important;
+            }
+        }
+        @media (min-width: 769px) {
+            .form-actions-sticky {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+            }
+        }
+    </style>
 </x-app-layout>

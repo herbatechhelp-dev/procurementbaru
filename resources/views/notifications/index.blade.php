@@ -1,16 +1,16 @@
 @extends('layouts.app')
 
 @section('header')
-    <h1 class="m-0 text-dark">Notifikasi</h1>
+    <h1 class="m-0">Notifikasi</h1>
 @endsection
 
 @section('content')
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
-            <div class="card card-outline card-primary">
-                <div class="card-header">
-                    <h3 class="card-title">Daftar Notifikasi</h3>
+            <div class="card shadow-sm rounded-lg">
+                <div class="card-header border-bottom-0 pb-0 pt-4 px-4">
+                    <h3 class="card-title text-lg font-medium">Daftar Notifikasi</h3>
                     <div class="card-tools">
                         @if($notifications->count() > 0)
                             <form action="{{ route('notifications.mark-all-as-read') }}" method="POST" class="d-inline">
@@ -19,7 +19,7 @@
                                     <i class="fas fa-check-double mr-1"></i> Tandai Semua Terbaca
                                 </button>
                             </form>
-                            <form action="{{ route('notifications.clear-all') }}" method="POST" class="d-inline ml-1" onsubmit="return confirm('Apakah Anda yakin ingin menghapus semua riwayat notifikasi?')">
+                            <form action="{{ route('notifications.clear-all') }}" method="POST" class="d-inline ml-1 form-confirm" data-message="Apakah Anda yakin ingin menghapus semua riwayat notifikasi?">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-sm btn-danger">
@@ -31,7 +31,7 @@
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover table-striped mb-0">
+                        <table class="table table-hover table-borderless mb-0">
                             <thead>
                                 <tr>
                                     <th style="width: 10px">#</th>
@@ -58,7 +58,7 @@
                                             <a href="{{ route('notifications.mark-as-read', $notification->id) }}" class="btn btn-sm btn-primary" title="Lihat">
                                                 <i class="fas fa-eye"></i>
                                             </a>
-                                            <form action="{{ route('notifications.destroy', $notification->id) }}" method="POST" class="d-inline ml-1" onsubmit="return confirm('Hapus notifikasi ini?')">
+                                            <form action="{{ route('notifications.destroy', $notification->id) }}" method="POST" class="d-inline ml-1 form-confirm" data-message="Hapus notifikasi ini?">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
