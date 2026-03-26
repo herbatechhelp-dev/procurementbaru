@@ -378,18 +378,8 @@ class PurchaseRequestController extends Controller
                 'approved_at' => now(),
             ]);
             
-            // Check if all items are approved by OM
-            $allApproved = $item->purchaseRequest->items()
-                ->where('status', '!=', 'approved_om')
-                ->doesntExist();
-            
-            if ($allApproved) {
-                $item->purchaseRequest->update(['status' => 'approved_om']);
-                
-                // Notify General Manager(s) + Superadmins
-                $gms = User::role(['general_manager', 'superadmin'])->get();
-                Notification::send($gms, new PrActionRequiredNotification($item->purchaseRequest, "PR {$item->purchaseRequest->pr_number} menunggu persetujuan General Manager."));
-            }
+            // Evaluate PR advancement
+            $this->checkAndAdvancePrStatus($item->purchaseRequest);
             
             // Notify requester + Superadmins + Department OM
             $recipients = $this->getSharedRecipients($item->purchaseRequest->department_id, $item->purchaseRequest->user);
@@ -414,25 +404,8 @@ class PurchaseRequestController extends Controller
                 'approved_at' => now(),
             ]);
             
-            $allApproved = $item->purchaseRequest->items()
-                ->where('status', '!=', 'approved_gm')
-                ->doesntExist();
-
-            // Notify requester + Superadmins + Department OM
-            $recipients = $this->getSharedRecipients($item->purchaseRequest->department_id, $item->purchaseRequest->user);
-            $message = "Item '{$item->item_name}' telah disetujui oleh General Manager.";
-            if ($request->filled('notes')) {
-                $message .= " Catatan: {$request->notes}";
-            }
-            Notification::send($recipients, new PrStatusUpdatedNotification($item->purchaseRequest, $message));
-
-            if ($allApproved) {
-                $item->purchaseRequest->update(['status' => 'approved_gm']);
-                
-                // Notify Procurement + Superadmins
-                $procurement = User::role(['procurement', 'superadmin'])->get();
-                Notification::send($procurement, new PrActionRequiredNotification($item->purchaseRequest, "PR {$item->purchaseRequest->pr_number} menunggu proses Procurement."));
-            }
+            // Evaluate PR advancement
+            $this->checkAndAdvancePrStatus($item->purchaseRequest);
 
             
         } elseif (($user->hasRole('procurement') || $user->hasRole('superadmin')) && $item->status === 'approved_gm') {
@@ -458,13 +431,10 @@ class PurchaseRequestController extends Controller
                 'approved_at' => now(),
             ]);
             
-            $allApproved = $item->purchaseRequest->items()
-                ->where('status', '!=', 'approved_proc')
-                ->doesntExist();
-            
-            if ($allApproved) {
-                $item->purchaseRequest->update(['status' => 'approved_proc']);
-            }
+            // Evaluate PR advancement
+            $this->checkAndAdvancePrStatus($item->purchaseRequest);
+        } else {
+            return redirect()->back()->with('error', 'Status item tidak dapat disetujui saat ini (Invalid approval action).');
         }
 
         return redirect()->back()->with('success', 'Item approved successfully.');
@@ -515,14 +485,8 @@ class PurchaseRequestController extends Controller
             'approved_at' => now(),
         ]);
 
-        // Update PR status if all items are rejected
-        $allRejected = $item->purchaseRequest->items()
-            ->whereNotIn('status', [$status, 'rejected_' . $status])
-            ->doesntExist();
-        
-        if ($allRejected) {
-            $item->purchaseRequest->update(['status' => $status]);
-        }
+        // Evaluate PR advancement
+        $this->checkAndAdvancePrStatus($item->purchaseRequest);
 
         return redirect()->back()->with('success', 'Item rejected successfully.');
     }
@@ -936,6 +900,42 @@ class PurchaseRequestController extends Controller
         });
     }
 
-}
+    private function checkAndAdvancePrStatus(PurchaseRequest $pr)
+    {
+        // 1. Check if OM stage is done
+        $omDone = $pr->items()->where('status', 'pending')->doesntExist();
+        if ($omDone && $pr->status === 'pending') {
+            if ($pr->items()->where('status', 'approved_om')->exists()) {
+                $pr->update(['status' => 'approved_om']);
+                $gms = User::role(['general_manager', 'superadmin'])->get();
+                Notification::send($gms, new PrActionRequiredNotification($pr, "PR {$pr->pr_number} menunggu persetujuan General Manager."));
+            } elseif ($pr->items()->where('status', 'rejected_om')->count() === $pr->items()->count()) {
+                $pr->update(['status' => 'rejected_om']);
+            }
+        }
 
+        // 2. Check if GM stage is done
+        $gmDone = $pr->items()->whereIn('status', ['pending', 'approved_om'])->doesntExist();
+        if ($gmDone && in_array($pr->status, ['pending', 'approved_om'])) {
+            if ($pr->items()->where('status', 'approved_gm')->exists()) {
+                $pr->update(['status' => 'approved_gm']);
+                $proc = User::role(['procurement', 'superadmin'])->get();
+                Notification::send($proc, new PrActionRequiredNotification($pr, "PR {$pr->pr_number} menunggu proses Procurement."));
+            } elseif ($pr->items()->whereIn('status', ['rejected_om', 'rejected_gm'])->count() === $pr->items()->count()) {
+                $pr->update(['status' => 'rejected_gm']);
+            }
+        }
+
+        // 3. Check if Procurement stage is done
+        $procDone = $pr->items()->whereIn('status', ['pending', 'approved_om', 'approved_gm'])->doesntExist();
+        if ($procDone && in_array($pr->status, ['pending', 'approved_om', 'approved_gm'])) {
+            if ($pr->items()->where('status', 'approved_proc')->exists()) {
+                $pr->update(['status' => 'approved_proc']);
+            } elseif ($pr->items()->whereIn('status', ['rejected_om', 'rejected_gm', 'rejected_proc'])->count() === $pr->items()->count()) {
+                $pr->update(['status' => 'rejected_proc']);
+            }
+        }
+    }
+
+}
 
