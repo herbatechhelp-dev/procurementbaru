@@ -8,159 +8,159 @@
     <!-- Small boxes (Stat box) -->
     <div class="row">
         @if(Auth::user()->hasRole('superadmin'))
-            <div class="col-lg-3 col-6">
-                <div class="card bg-info p-3 mb-4 rounded-lg shadow-sm">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <p class="text-uppercase text-xs font-weight-bold mb-1 opacity-75">Total Purchase Requests</p>
-                            <h3 class="mb-0 font-weight-bolder">{{ $stats['total_pr'] }}</h3>
-                        </div>
-                        <div class="icon bg-white bg-opacity-25 rounded-circle p-2">
-                            <i class="fas fa-file-invoice-dollar fa-fw"></i>
-                        </div>
+        <div class="col-lg-3 col-6">
+            <div class="card bg-info p-3 mb-4 rounded-lg shadow-sm">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="text-uppercase text-xs font-weight-bold mb-1 opacity-75">Total Purchase Requests</p>
+                        <h3 class="mb-0 font-weight-bolder">{{ $stats['total_pr'] }}</h3>
                     </div>
-                    <a href="{{ route('purchase-requests.index') }}" class="small-box-footer mt-3 d-block text-sm text-white opacity-75 hover-opacity-100">View All <i class="fas fa-arrow-right ml-1"></i></a>
-                </div>
-            </div>
-            <div class="col-lg-3 col-6">
-                <div class="card bg-warning p-3 mb-4 rounded-lg shadow-sm">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <p class="text-uppercase text-xs font-weight-bold mb-1 opacity-75">Pending Approval</p>
-                            <h3 class="mb-0 font-weight-bolder">{{ $stats['pending_pr'] }}</h3>
-                        </div>
-                        <div class="icon bg-dark bg-opacity-25 rounded-circle p-2">
-                            <i class="fas fa-clock fa-fw"></i>
-                        </div>
+                    <div class="icon bg-white bg-opacity-25 rounded-circle p-2">
+                        <i class="fas fa-file-invoice-dollar fa-fw"></i>
                     </div>
-                    <a href="{{ route('purchase-requests.index', ['status' => 'pending']) }}" class="small-box-footer mt-3 d-block text-sm opacity-75 hover-opacity-100">Review Now <i class="fas fa-arrow-right ml-1"></i></a>
                 </div>
+                <a href="{{ route('purchase-requests.index') }}" class="small-box-footer mt-3 d-block text-sm text-white opacity-75 hover-opacity-100">View All <i class="fas fa-arrow-right ml-1"></i></a>
             </div>
-            <div class="col-lg-3 col-6">
-                <div class="card bg-success p-3 mb-4 rounded-lg shadow-sm">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <p class="text-uppercase text-xs font-weight-bold mb-1 opacity-75">Total Users</p>
-                            <h3 class="mb-0 font-weight-bolder">{{ $stats['total_users'] }}</h3>
-                        </div>
-                        <div class="icon bg-white bg-opacity-25 rounded-circle p-2">
-                            <i class="fas fa-users fa-fw"></i>
-                        </div>
+        </div>
+        <div class="col-lg-3 col-6">
+            <div class="card bg-warning p-3 mb-4 rounded-lg shadow-sm">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="text-uppercase text-xs font-weight-bold mb-1 opacity-75">Pending Approval</p>
+                        <h3 class="mb-0 font-weight-bolder">{{ $stats['pending_pr'] }}</h3>
                     </div>
-                    <a href="{{ route('users.index') }}" class="small-box-footer mt-3 d-block text-sm text-white opacity-75 hover-opacity-100">Manage Users <i class="fas fa-arrow-right ml-1"></i></a>
-                </div>
-            </div>
-            <div class="col-lg-3 col-6">
-                <div class="card bg-secondary p-3 mb-4 rounded-lg shadow-sm">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <p class="text-uppercase text-xs font-weight-bold mb-1 opacity-75">Departments</p>
-                            <h3 class="mb-0 font-weight-bolder">{{ $stats['total_departments'] }}</h3>
-                        </div>
-                        <div class="icon bg-white bg-opacity-25 rounded-circle p-2">
-                            <i class="fas fa-building fa-fw"></i>
-                        </div>
+                    <div class="icon bg-dark bg-opacity-25 rounded-circle p-2">
+                        <i class="fas fa-clock fa-fw"></i>
                     </div>
-                    <a href="{{ route('departments.index') }}" class="small-box-footer mt-3 d-block text-sm text-white opacity-75 hover-opacity-100">Manage Depts <i class="fas fa-arrow-right ml-1"></i></a>
                 </div>
+                <a href="{{ route('purchase-requests.index', ['status' => 'pending']) }}" class="small-box-footer mt-3 d-block text-sm opacity-75 hover-opacity-100">Review Now <i class="fas fa-arrow-right ml-1"></i></a>
             </div>
+        </div>
+        <div class="col-lg-3 col-6">
+            <div class="card bg-success p-3 mb-4 rounded-lg shadow-sm">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="text-uppercase text-xs font-weight-bold mb-1 opacity-75">Total Users</p>
+                        <h3 class="mb-0 font-weight-bolder">{{ $stats['total_users'] }}</h3>
+                    </div>
+                    <div class="icon bg-white bg-opacity-25 rounded-circle p-2">
+                        <i class="fas fa-users fa-fw"></i>
+                    </div>
+                </div>
+                <a href="{{ route('users.index') }}" class="small-box-footer mt-3 d-block text-sm text-white opacity-75 hover-opacity-100">Manage Users <i class="fas fa-arrow-right ml-1"></i></a>
+            </div>
+        </div>
+        <div class="col-lg-3 col-6">
+            <div class="card bg-secondary p-3 mb-4 rounded-lg shadow-sm">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="text-uppercase text-xs font-weight-bold mb-1 opacity-75">Departments</p>
+                        <h3 class="mb-0 font-weight-bolder">{{ $stats['total_departments'] }}</h3>
+                    </div>
+                    <div class="icon bg-white bg-opacity-25 rounded-circle p-2">
+                        <i class="fas fa-building fa-fw"></i>
+                    </div>
+                </div>
+                <a href="{{ route('departments.index') }}" class="small-box-footer mt-3 d-block text-sm text-white opacity-75 hover-opacity-100">Manage Depts <i class="fas fa-arrow-right ml-1"></i></a>
+            </div>
+        </div>
 
         @elseif(Auth::user()->hasRole('user'))
-             <div class="col-lg-3 col-6">
-                <div class="card bg-info p-3 mb-4 rounded-lg shadow-sm">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <p class="text-uppercase text-xs font-weight-bold mb-1 opacity-75">My Requests</p>
-                            <h3 class="mb-0 font-weight-bolder">{{ $stats['my_pr'] }}</h3>
-                        </div>
-                        <div class="icon bg-white bg-opacity-25 rounded-circle p-2">
-                            <i class="fas fa-file-alt fa-fw"></i>
-                        </div>
+        <div class="col-lg-3 col-6">
+            <div class="card bg-info p-3 mb-4 rounded-lg shadow-sm">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="text-uppercase text-xs font-weight-bold mb-1 opacity-75">My Requests</p>
+                        <h3 class="mb-0 font-weight-bolder">{{ $stats['my_pr'] }}</h3>
+                    </div>
+                    <div class="icon bg-white bg-opacity-25 rounded-circle p-2">
+                        <i class="fas fa-file-alt fa-fw"></i>
                     </div>
                 </div>
             </div>
-             <div class="col-lg-3 col-6">
-                <div class="card bg-warning p-3 mb-4 rounded-lg shadow-sm">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <p class="text-uppercase text-xs font-weight-bold mb-1 opacity-75">Pending</p>
-                            <h3 class="mb-0 font-weight-bolder">{{ $stats['pending_pr'] }}</h3>
-                        </div>
-                        <div class="icon bg-dark bg-opacity-25 rounded-circle p-2">
-                            <i class="fas fa-hourglass-half fa-fw"></i>
-                        </div>
+        </div>
+        <div class="col-lg-3 col-6">
+            <div class="card bg-warning p-3 mb-4 rounded-lg shadow-sm">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="text-uppercase text-xs font-weight-bold mb-1 opacity-75">Pending</p>
+                        <h3 class="mb-0 font-weight-bolder">{{ $stats['pending_pr'] }}</h3>
+                    </div>
+                    <div class="icon bg-dark bg-opacity-25 rounded-circle p-2">
+                        <i class="fas fa-hourglass-half fa-fw"></i>
                     </div>
                 </div>
             </div>
-             <div class="col-lg-3 col-6">
-                <div class="card bg-success p-3 mb-4 rounded-lg shadow-sm">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <p class="text-uppercase text-xs font-weight-bold mb-1 opacity-75">Approved</p>
-                            <h3 class="mb-0 font-weight-bolder">{{ $stats['approved_pr'] }}</h3>
-                        </div>
-                        <div class="icon bg-white bg-opacity-25 rounded-circle p-2">
-                            <i class="fas fa-check-circle fa-fw"></i>
-                        </div>
+        </div>
+        <div class="col-lg-3 col-6">
+            <div class="card bg-success p-3 mb-4 rounded-lg shadow-sm">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="text-uppercase text-xs font-weight-bold mb-1 opacity-75">Approved</p>
+                        <h3 class="mb-0 font-weight-bolder">{{ $stats['approved_pr'] }}</h3>
+                    </div>
+                    <div class="icon bg-white bg-opacity-25 rounded-circle p-2">
+                        <i class="fas fa-check-circle fa-fw"></i>
                     </div>
                 </div>
             </div>
-             <div class="col-lg-3 col-6">
-                <div class="card bg-danger p-3 mb-4 rounded-lg shadow-sm">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <p class="text-uppercase text-xs font-weight-bold mb-1 opacity-75">Rejected</p>
-                            <h3 class="mb-0 font-weight-bolder">{{ $stats['rejected_pr'] }}</h3>
-                        </div>
-                        <div class="icon bg-white bg-opacity-25 rounded-circle p-2">
-                            <i class="fas fa-times-circle fa-fw"></i>
-                        </div>
+        </div>
+        <div class="col-lg-3 col-6">
+            <div class="card bg-danger p-3 mb-4 rounded-lg shadow-sm">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="text-uppercase text-xs font-weight-bold mb-1 opacity-75">Rejected</p>
+                        <h3 class="mb-0 font-weight-bolder">{{ $stats['rejected_pr'] }}</h3>
+                    </div>
+                    <div class="icon bg-white bg-opacity-25 rounded-circle p-2">
+                        <i class="fas fa-times-circle fa-fw"></i>
                     </div>
                 </div>
             </div>
+        </div>
 
         @else
-             <!-- Managers -->
-             <div class="col-lg-3 col-6">
-                <div class="card bg-primary p-3 mb-4 rounded-lg shadow-sm">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <p class="text-uppercase text-xs font-weight-bold mb-1 opacity-75">PR to Review</p>
-                            <h3 class="mb-0 font-weight-bolder">{{ $stats['pr_to_review'] }}</h3>
-                        </div>
-                        <div class="icon bg-white bg-opacity-25 rounded-circle p-2">
-                            <i class="fas fa-clipboard-check fa-fw"></i>
-                        </div>
+        <!-- Managers -->
+        <div class="col-lg-3 col-6">
+            <div class="card bg-primary p-3 mb-4 rounded-lg shadow-sm">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="text-uppercase text-xs font-weight-bold mb-1 opacity-75">PR to Review</p>
+                        <h3 class="mb-0 font-weight-bolder">{{ $stats['pr_to_review'] }}</h3>
                     </div>
-                    <a href="{{ route('purchase-requests.index', ['status' => 'pending']) }}" class="small-box-footer mt-3 d-block text-sm text-white opacity-75 hover-opacity-100">Review Now <i class="fas fa-arrow-right ml-1"></i></a>
-                </div>
-            </div>
-             <div class="col-lg-3 col-6">
-                <div class="card bg-info p-3 mb-4 rounded-lg shadow-sm">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <p class="text-uppercase text-xs font-weight-bold mb-1 opacity-75">Total PR in System</p>
-                            <h3 class="mb-0 font-weight-bolder">{{ $stats['total_pr'] }}</h3>
-                        </div>
-                        <div class="icon bg-white bg-opacity-25 rounded-circle p-2">
-                            <i class="fas fa-list fa-fw"></i>
-                        </div>
+                    <div class="icon bg-white bg-opacity-25 rounded-circle p-2">
+                        <i class="fas fa-clipboard-check fa-fw"></i>
                     </div>
                 </div>
+                <a href="{{ route('purchase-requests.index', ['status' => 'pending']) }}" class="small-box-footer mt-3 d-block text-sm text-white opacity-75 hover-opacity-100">Review Now <i class="fas fa-arrow-right ml-1"></i></a>
             </div>
-             <div class="col-lg-3 col-6">
-                <div class="card bg-success p-3 mb-4 rounded-lg shadow-sm">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <p class="text-uppercase text-xs font-weight-bold mb-1 opacity-75">Approved Today</p>
-                            <h3 class="mb-0 font-weight-bolder">{{ $stats['approved_today'] }}</h3>
-                        </div>
-                        <div class="icon bg-white bg-opacity-25 rounded-circle p-2">
-                            <i class="fas fa-calendar-check fa-fw"></i>
-                        </div>
+        </div>
+        <div class="col-lg-3 col-6">
+            <div class="card bg-info p-3 mb-4 rounded-lg shadow-sm">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="text-uppercase text-xs font-weight-bold mb-1 opacity-75">Total PR in System</p>
+                        <h3 class="mb-0 font-weight-bolder">{{ $stats['total_pr'] }}</h3>
+                    </div>
+                    <div class="icon bg-white bg-opacity-25 rounded-circle p-2">
+                        <i class="fas fa-list fa-fw"></i>
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="col-lg-3 col-6">
+            <div class="card bg-success p-3 mb-4 rounded-lg shadow-sm">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="text-uppercase text-xs font-weight-bold mb-1 opacity-75">Approved Today</p>
+                        <h3 class="mb-0 font-weight-bolder">{{ $stats['approved_today'] }}</h3>
+                    </div>
+                    <div class="icon bg-white bg-opacity-25 rounded-circle p-2">
+                        <i class="fas fa-calendar-check fa-fw"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
         @endif
     </div>
 
@@ -208,7 +208,7 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                       <table class="table table-hover table-borderless text-sm">
+                        <table class="table table-hover table-borderless text-sm">
                             <thead>
                                 <tr>
                                     <th>PR Number</th>
@@ -228,19 +228,19 @@
                                     <td>{{ $pr->department->code }}</td>
                                     <td>
                                         @php
-                                            $statusLabel = $pr->approval_status;
-                                            $badgeClass = match($statusLabel) {
-                                                'Draft' => 'badge-secondary',
-                                                'Pending' => 'badge-warning',
-                                                'Revision Required' => 'badge-danger',
-                                                'Partial / Revision' => 'badge-warning',
-                                                'Processing' => 'badge-info',
-                                                'Approved (OM)', 'Approved (GM)', 'Approved (Proc)' => 'badge-info',
-                                                'Ordered' => 'badge-primary',
-                                                'Delivered' => 'badge-teal',
-                                                'Completed' => 'badge-success',
-                                                default => 'badge-secondary'
-                                            };
+                                        $statusLabel = $pr->approval_status;
+                                        $badgeClass = match($statusLabel) {
+                                        'Draft' => 'badge-secondary',
+                                        'Pending' => 'badge-warning',
+                                        'Revision Required' => 'badge-danger',
+                                        'Partial / Revision' => 'badge-warning',
+                                        'Processing' => 'badge-info',
+                                        'Approved (OM)', 'Approved (GM)', 'Approved (Proc)' => 'badge-info',
+                                        'Ordered' => 'badge-primary',
+                                        'Delivered' => 'badge-teal',
+                                        'Completed' => 'badge-success',
+                                        default => 'badge-secondary'
+                                        };
                                         @endphp
                                         <span class="badge {{ $badgeClass }}">{{ $statusLabel }}</span>
                                     </td>
@@ -282,7 +282,7 @@
                         legend: {
                             position: 'bottom',
                             labels: {
-                                color: '#a0aec0' 
+                                color: '#a0aec0'
                             }
                         }
                     }
