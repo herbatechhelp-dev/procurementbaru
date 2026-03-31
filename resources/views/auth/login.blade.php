@@ -43,9 +43,8 @@
             </label>
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-
-            <x-primary-button class="ms-3">
+        <div class="flex items-center justify-center mt-6 w-full">
+            <x-primary-button class="w-full justify-center py-3 text-lg">
                 {{ __('Log in') }}
             </x-primary-button>
         </div>
