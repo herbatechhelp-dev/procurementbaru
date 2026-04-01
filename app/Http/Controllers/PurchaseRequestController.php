@@ -729,8 +729,7 @@ class PurchaseRequestController extends Controller
         } elseif ($request->status === 'delivered') {
             $updateData['delivered_at'] = now();
             $msg = "Item '{$item->item_name}' telah dikirim (Delivered).";
-            // Notify user about status change (using legacy notification if needed, but we use status update for consistency)
-            // $item->purchaseRequest->user->notify(new ItemDeliveredNotification($item));
+            $item->purchaseRequest->user->notify(new ItemDeliveredNotification($item));
         } elseif ($request->status === 'completed') {
             $updateData['completed_at'] = now();
             $msg = "Item '{$item->item_name}' telah selesai diproses (Completed).";
@@ -740,6 +739,12 @@ class PurchaseRequestController extends Controller
         
         // Notify requester + Superadmins + Department OM
         $recipients = $this->getSharedRecipients($item->purchaseRequest->department_id, $item->purchaseRequest->user);
+
+        if ($request->status === 'delivered') {
+            $requesterId = $item->purchaseRequest->user->id;
+            $recipients = $recipients->reject(fn ($user) => $user->id === $requesterId);
+        }
+
         Notification::send($recipients, new PrStatusUpdatedNotification($item->purchaseRequest, $msg));
 
 
