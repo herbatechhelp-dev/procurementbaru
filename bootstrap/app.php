@@ -4,7 +4,8 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 
-return Application::configure(basePath: dirname(__DIR__))
+/** @var \Illuminate\Foundation\Application $app */
+$app = Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
         commands: __DIR__.'/../routes/console.php',
@@ -22,9 +23,8 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })->create();
 
-// Override public path for shared hosting (public_html)
-$app->usePublicPath(realpath(base_path(
-    file_exists(base_path('public_html')) ? 'public_html' : 'public'
-)));
+// Use public_html automatically on shared hosting when that directory exists.
+$publicPath = base_path(file_exists(base_path('public_html')) ? 'public_html' : 'public');
+$app->usePublicPath($publicPath);
 
 return $app;
